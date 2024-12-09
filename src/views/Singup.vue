@@ -22,12 +22,14 @@
                     :rules="[val => !!val || 'Ingrese su nombre de usuario']" />
                   <q-input v-model="form.email" label="Email" type="email" outlined dense color="primary"
                     class="q-mt-md bordered-input text-bold"
-                    :rules="[
+                    :rules="[ 
                       val => !!val || 'Ingrese un email valido', 
                       val => /.+@.+\..+/.test(val) || 'Email no válido']" />
                   <q-input v-model="form.password" :type="showPassword ? 'text' : 'password'" label="Contraseña"
                     outlined dense color="primary" class="q-mt-md bordered-input text-bold"
-                    :rules="[val => !!val || 'Ingrese una contraseña']">
+                    :rules="[ 
+                      val => !!val || 'Ingrese una contraseña',
+                      val => val.length >= 8 || 'La contraseña debe tener al menos 8 caracteres']">
                     <template v-slot:append>
                       <q-icon :name="showPassword ? '😐' : '😑'" class="cursor-pointer"
                         @click="togglePasswordVisibility" />
@@ -65,7 +67,7 @@ const form = ref({
 const error = ref("");
 const loading = ref(false);
 const formRef = ref(null);
-const showPassword = ref(false); // Estado para mostrar/ocultar contraseña
+const showPassword = ref(false);
 const router = useRouter();
 const $q = useQuasar();
 
@@ -88,6 +90,7 @@ const handleSubmit = async () => {
 
   try {
     const payload = {
+      nombre: form.value.name,
       email: form.value.email,
       contraseña: form.value.password,
     };
@@ -97,7 +100,12 @@ const handleSubmit = async () => {
 
     $q.notify({
       type: "positive",
-      message: `Welcome, ${form.value.name}! Su registro fue exitoso.`,
+      message: `Bienvenido, ${form.value.name}! Su registro fue exitoso.`,
+    });
+
+    $q.notify({
+      type: "info",
+      message: "Por favor, inicie sesión con el usuario que acaba de crear.",
     });
 
     form.value.name = "";
@@ -105,12 +113,11 @@ const handleSubmit = async () => {
     form.value.password = "";
     loading.value = false;
 
-    // Redirige a Home después del registro
-    router.push("/home");
+    router.push("/");
   } catch (err) {
     console.error("Error al registrar el usuario:", err);
     error.value =
-      err.response?.data?.msg || "Ocurrio un error, intentelo nuevamente.";
+      err.response?.data?.msg || "Ocurrió un error, inténtelo nuevamente.";
     $q.notify({
       type: "negative",
       message: error.value,

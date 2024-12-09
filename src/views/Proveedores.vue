@@ -72,7 +72,7 @@
 								(val !== null && val !== undefined) ||
 								'La identificación es obligatoria',
 							(val) =>
-								val > 0 || 'La identificación debe ser un número mayor a 0',
+								val.toString().length >= 10 || 'La identificación debe ser un número mayor a 10',
 						]" />
 
 					<q-input

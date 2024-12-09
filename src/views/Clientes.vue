@@ -1,109 +1,111 @@
 <template>
 	<div>
-		<h4 class="text-center text-weight-bold">Clientes</h4>
-		<hr />
-		<div class="main-btn-registrar">
+	  <h4 class="text-center text-weight-bold">Clientes</h4>
+	  <hr />
+	  <div class="main-btn-registrar">
+		<q-btn
+		  label="Registrar"
+		  @click="
+			mostrarFormularioCliente = true;
+			accionFormulario = true;
+		  "
+		  class="q-mb-md"
+		  id="btn-registrar" />
+	  </div>
+  
+	  <q-table class="tabla-views" :rows="rows" :columns="columns" row-key="name">
+		<template v-slot:top> </template>
+		<template v-slot:header="props">
+		  <tr>
+			<th v-for="col in props.cols" :key="col.name" :class="'tabla-header'">
+			  <span>{{ col.label }}</span>
+			</th>
+		  </tr>
+		</template>
+  
+		<template v-slot:body-cell-estado="props">
+		  <q-td :props="props" class="q-pa-sm">
+			<span style="color: green" v-if="props.row.estado == 1">Activo</span>
+			<span style="color: red" v-else>Inactivo</span>
+		  </q-td>
+		</template>
+  
+		<template v-slot:body-cell-opciones="props">
+		  <q-td :props="props" class="tabla-cell opciones">
 			<q-btn
-				label="Registrar"
-				@click="
-					mostrarFormularioCliente = true;
-					accionFormulario = true;
-				"
-				class="q-mb-md"
-				id="btn-registrar" />
-		</div>
-
-		<q-table class="tabla-views" :rows="rows" :columns="columns" row-key="name">
-			<template v-slot:top> </template>
-			<template v-slot:header="props">
-				<tr>
-					<th v-for="col in props.cols" :key="col.name" :class="'tabla-header'">
-						<span>{{ col.label }}</span>
-					</th>
-				</tr>
-			</template>
-
-			<template v-slot:body-cell-estado="props">
-				<q-td :props="props" class="q-pa-sm">
-					<span style="color: green" v-if="props.row.estado == 1">Activo</span>
-					<span style="color: red" v-else>Inactivo</span>
-				</q-td>
-			</template>
-
-			<template v-slot:body-cell-opciones="props">
-				<q-td :props="props" class="tabla-cell opciones">
-					<q-btn
-						icon="edit"
-						color="primary"
-						flat
-						@click="controlFormulario(false, props.row)"
-						class="q-mr-sm" />
-					<q-btn
-						:icon="props.row.estado === 1 ? 'remove_circle' : 'check_circle'"
-						color="negative"
-						flat
-						@click="editarEstado(props.row)" />
-				</q-td>
-			</template>
-		</q-table>
-
-		<!-- Dialog para editar el artículo -->
-		<q-dialog v-model="mostrarFormularioCliente" persistent>
-			<q-card>
-				<div class="text-h6">{{ accionFormulario ? "Agregar" : "Editar" }} Cliente</div>
-				<q-card-section>
-					<q-input
-						v-model="nombreCliente"
-						label="Nombre"
-						filled
-						:rules="[
-							(val) => (val && val.length > 0) || 'El nombre es obligatorio',
-						]" />
-
-					<q-input
-						v-model="numCedulaCliente"
-						label="Numero de cedula"
-						filled
-						:rules="[
-							(val) => (val && val.length > 0) || 'El numero de cedula es obligatorio',
-						]" />
-
-					<q-input
-						v-model="telefonoCliente"
-						label="Telefono"
-						filled
-						:rules="[
-							(val) => (val && val.length > 0) || 'El telefono es obligatorio',
-						]" />
-
-					<q-input
-						v-model="emailCliente"
-						label="Correo"
-						filled
-						:rules="[
-							(val) => (val && val.length > 0) || 'El email es obligatorio',
-							(val) => /.+@.+\..+/.test(val) || 'El email debe ser válido',
-						]" />
-
-				</q-card-section>
-
-				<q-card-actions>
-					<q-btn
-						label="Cancelar"
-						color="secondary"
-						flat
-						@click="mostrarFormularioCliente = false; reset()" />
-					<q-btn
-						:label="accionFormulario ? 'Guardar' : 'Editar'"
-						color="primary"
-						flat
-						@click="accionFormulario ? agregar() : editar()"
-						:disable="!formValido" />
-				</q-card-actions>
-			</q-card>
-		</q-dialog>
+			  icon="edit"
+			  color="primary"
+			  flat
+			  @click="controlFormulario(false, props.row)"
+			  class="q-mr-sm" />
+			<q-btn
+			  :icon="props.row.estado === 1 ? 'remove_circle' : 'check_circle'"
+			  color="negative"
+			  flat
+			  @click="editarEstado(props.row)" />
+		  </q-td>
+		</template>
+	  </q-table>
+  
+	  <!-- Dialog para editar el artículo -->
+	  <q-dialog v-model="mostrarFormularioCliente" persistent>
+		<q-card>
+		  <div class="text-h6">{{ accionFormulario ? "Agregar" : "Editar" }} Cliente</div>
+		  <q-card-section>
+			<q-input
+			  v-model="nombreCliente"
+			  label="Nombre"
+			  filled
+			  :rules="[ 
+				(val) => (val && val.length > 0) || 'El nombre es obligatorio',
+			  ]" />
+  
+			<!-- Validación de cédula (10 dígitos) -->
+			<q-input
+			  v-model="numCedulaCliente"
+			  label="Numero de cedula"
+			  filled
+			  :rules="[ 
+				(val) => (val && val.length === 10) || 'La cédula debe tener 10 dígitos',
+			  ]" />
+  
+			<!-- Validación de teléfono (10 dígitos) -->
+			<q-input
+			  v-model="telefonoCliente"
+			  label="Telefono"
+			  filled
+			  :rules="[ 
+				(val) => (val && val.length === 10) || 'El teléfono debe tener 10 dígitos',
+			  ]" />
+  
+			<q-input
+			  v-model="emailCliente"
+			  label="Correo"
+			  filled
+			  :rules="[ 
+				(val) => (val && val.length > 0) || 'El email es obligatorio',
+				(val) => /.+@.+\..+/.test(val) || 'El email debe ser válido',
+			  ]" />
+  
+		  </q-card-section>
+  
+		  <q-card-actions>
+			<q-btn
+			  label="Cancelar"
+			  color="secondary"
+			  flat
+			  @click="mostrarFormularioCliente = false; reset()" />
+			<q-btn
+			  :label="accionFormulario ? 'Guardar' : 'Editar'"
+			  color="primary"
+			  flat
+			  @click="accionFormulario ? agregar() : editar()"
+			  :disable="!formValido" />
+		  </q-card-actions>
+		</q-card>
+	  </q-dialog>
 	</div>
-</template>
+  </template>  
 
 <script setup>
 import { onMounted, ref, computed } from "vue";

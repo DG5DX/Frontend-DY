@@ -69,7 +69,7 @@
 							(val) =>
 								(val !== null && val !== undefined) ||
 								'El precio es obligatorio',
-							(val) => val > 0 || 'El precio debe ser un número mayor a 0',
+							(val) => val > 0 || 'El precio debe tener un valor',
 						]" />
 
 					<q-input
@@ -100,7 +100,7 @@
 						label="Categoría"
 						:options="opcionesCategoria"
 						filled
-						:rules="[(val) => val || 'La categoria es obligatorio']" />
+						:rules="[(val) => val || 'La categoria es obligatoria']" />
 				</q-card-section>
 
 				<q-card-actions>
