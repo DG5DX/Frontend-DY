@@ -25,8 +25,6 @@ const router = useRouter()
 const routes = [
   { name: 'Usuarios', path: '/usuarios', image: 'https://cdn-icons-png.freepik.com/512/11468/11468063.png' },
   { name: 'Clientes', path: '/terceros/clientes', image: 'https://cdn-icons-png.freepik.com/512/12155/12155222.png' },
-  { name: 'Salidas', path: '/salidas', image: 'https://cdn-icons-png.freepik.com/512/12155/12155241.png' },
-  { name: 'Entradas', path: '/entradas', image: 'https://cdn-icons-png.freepik.com/512/12154/12154947.png' },
   { name: 'Artículos', path: '/articulos', image: 'https://cdn-icons-png.freepik.com/512/12154/12154988.png' },
   { name: 'Categorías', path: '/categorias', image: 'https://cdn-icons-png.freepik.com/512/12154/12154936.png' },
   { name: 'Proveedores', path: '/terceros/proveedores', image: 'https://cdn-icons-png.freepik.com/512/12155/12155100.png' },

@@ -121,8 +121,10 @@
 <script setup>
 import { onMounted, ref, computed } from "vue";
 import { getData, postData, putData } from "../services/apiClient.js";
+import { useQuasar } from "quasar"; // Importar Quasar para manejar notificaciones
 
-// const mainStore = useStore();
+const $q = useQuasar();
+
 const rows = ref([]);
 let columns = ref([
 	{
@@ -135,20 +137,20 @@ let columns = ref([
 	{
 		name: "identificacion",
 		align: "center",
-		label: "Identificacion",
+		label: "Identificación",
 		field: "identificacion",
 		sortable: true,
 	},
 	{
 		name: "direccion",
 		align: "center",
-		label: "Direccion",
+		label: "Dirección",
 		field: "direccion",
 	},
 	{
 		name: "telefono",
 		align: "center",
-		label: "Telefono",
+		label: "Teléfono",
 		field: "telefono",
 	},
 	{
@@ -198,19 +200,39 @@ async function getProveedores() {
 	try {
 		const res = await getData("proveedores");
 		rows.value = res.terceros;
+		$q.notify({
+			type: "positive",
+			message: "Proveedores cargados exitosamente.",
+			timeout: 3000,
+		});
 	} catch (error) {
 		console.log(error);
+		$q.notify({
+			type: "negative",
+			message: "Error al cargar proveedores.",
+			timeout: 3000,
+		});
 	}
 }
 
 async function editarEstado(data) {
 	try {
-		const res = await putData(
+		await putData(
 			`proveedores/${data.estado === 1 ? "inactivar" : "activar"}/${data._id}`
 		);
 		getProveedores();
+		$q.notify({
+			type: "positive",
+			message: `Proveedor ${data.estado === 1 ? "inactivado" : "activado"} con éxito.`,
+			timeout: 3000,
+		});
 	} catch (error) {
 		console.log(error);
+		$q.notify({
+			type: "negative",
+			message: "Error al cambiar el estado del proveedor.",
+			timeout: 3000,
+		});
 	}
 }
 
@@ -222,12 +244,22 @@ async function agregar() {
 			direccion: direccionProveedores.value,
 			telefono: telefonoProveedores.value,
 		};
-		const res = await postData("proveedores", data);
+		await postData("proveedores", data);
 		mostrarFormularioProveedores.value = false;
 		reset();
 		getProveedores();
+		$q.notify({
+			type: "positive",
+			message: "Proveedor agregado exitosamente.",
+			timeout: 3000,
+		});
 	} catch (error) {
 		console.log(error);
+		$q.notify({
+			type: "negative",
+			message: "Error al agregar proveedor.",
+			timeout: 3000,
+		});
 	}
 }
 
@@ -239,15 +271,22 @@ async function editar() {
 			direccion: direccionProveedores.value,
 			telefono: telefonoProveedores.value,
 		};
-		const res = await putData(
-			`proveedores/${proveedorSeleccionado.value}`,
-			data
-		);
+		await putData(`proveedores/${proveedorSeleccionado.value}`, data);
 		mostrarFormularioProveedores.value = false;
 		reset();
 		getProveedores();
+		$q.notify({
+			type: "positive",
+			message: "Proveedor editado exitosamente.",
+			timeout: 3000,
+		});
 	} catch (error) {
 		console.log(error);
+		$q.notify({
+			type: "negative",
+			message: "Error al editar proveedor.",
+			timeout: 3000,
+		});
 	}
 }
 

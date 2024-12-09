@@ -123,15 +123,10 @@
 
 <script setup>
 import { onMounted, ref, computed } from "vue";
-import { useQuasar } from "quasar"; // Importamos useQuasar para acceder a las notificaciones
-// import { useAuthStore } from "../store/useAuth.js";
+import { useQuasar } from "quasar"; 
 import { getData, postData, putData } from "../services/apiClient.js";
 
-const $q = useQuasar(); // Accedemos a Quasar para usar sus notificaciones
-
-// const mainStore = useStore();
-// const articulo = ref({});
-// const card = ref(false);
+const $q = useQuasar();
 
 const categorias = ref([]);
 const rows = ref([]);
@@ -147,7 +142,7 @@ const columns = ref([
 		name: "categoria",
 		align: "center",
 		label: "Categoria",
-		field: (row) => { return row.categoria ? row.categoria.nombre : ""},
+		field: (row) => { return row.categoria ? row.categoria.nombre : "" },
 		sortable: true,
 	},
 	{
@@ -191,7 +186,6 @@ const imagenArticulo = ref("");
 const categoriaArticulo = ref("");
 
 const articuloSeleccionado = ref(null);
-// const authStore = useAuthStore();
 
 const formValido = computed(() => {
 	return (
@@ -227,7 +221,11 @@ async function getCategorias() {
 		const res = await getData("categorias");
 		categorias.value = res.categorias;
 	} catch (error) {
-		console.log(error);
+		$q.notify({
+			type: "negative",
+			message: "Error al obtener las categorías.",
+		});
+		console.error(error);
 	}
 }
 
@@ -236,18 +234,30 @@ async function getArticulos() {
 		const res = await getData("articulos");
 		rows.value = res.articulos;
 	} catch (error) {
-		console.log(error);
+		$q.notify({
+			type: "negative",
+			message: "Error al obtener los artículos.",
+		});
+		console.error(error);
 	}
 }
 
 async function editarEstado(data) {
 	try {
-		const res = await putData(
+		await putData(
 			`articulos/${data.estado === 1 ? "inactivar" : "activar"}/${data._id}`
 		);
 		getArticulos();
+		$q.notify({
+			type: "positive",
+			message: `Artículo ${data.estado === 1 ? "inactivado" : "activado"} correctamente.`,
+		});
 	} catch (error) {
-		console.log(error);
+		$q.notify({
+			type: "negative",
+			message: "Error al cambiar el estado del artículo.",
+		});
+		console.error(error);
 	}
 }
 
@@ -260,12 +270,20 @@ async function agregar() {
 			imagen: imagenArticulo.value,
 			categoria: categoriaArticulo.value.id,
 		};
-		const res = await postData("articulos", data);
+		await postData("articulos", data);
 		mostrarFormularioArticulo.value = false;
-		reset()
+		reset();
 		getArticulos();
+		$q.notify({
+			type: "positive",
+			message: "Artículo agregado correctamente.",
+		});
 	} catch (error) {
-		console.log(error);
+		$q.notify({
+			type: "negative",
+			message: "Error al agregar el artículo.",
+		});
+		console.error(error);
 	}
 }
 
@@ -278,12 +296,20 @@ async function editar() {
 			imagen: imagenArticulo.value,
 			categoria: categoriaArticulo.value.id,
 		};
-		const res = await putData(`articulos/${articuloSeleccionado.value}`, data);
+		await putData(`articulos/${articuloSeleccionado.value}`, data);
 		mostrarFormularioArticulo.value = false;
-		reset()
+		reset();
 		getArticulos();
+		$q.notify({
+			type: "positive",
+			message: "Artículo editado correctamente.",
+		});
 	} catch (error) {
-		console.log(error);
+		$q.notify({
+			type: "negative",
+			message: "Error al editar el artículo.",
+		});
+		console.error(error);
 	}
 }
 
@@ -298,89 +324,6 @@ function controlFormulario(accion, datos) {
 	accionFormulario.value = accion;
 	mostrarFormularioArticulo.value = true;
 }
-
-// const dataArticulos = async () => {
-// 	try {
-// 		const response = await getData("/articulos/articulos");
-// 		if (response.articulos) {
-// 			rows.value = response.articulos;
-// 			console.log("Articulos recibidos", response.articulos);
-// 		} else {
-// 			console.log("Respuesta sin artículos", response);
-// 		}
-// 	} catch (error) {
-// 		console.log("Error al obtener artículos", error.message);
-// 		$q.notify({
-// 			type: "negative",
-// 			message: `Error: ${error.message}`,
-// 		});
-// 	}
-// };
-
-// const toggleStatus = async (row) => {
-// 	try {
-// 		const newStatus = row.status === 1 ? 0 : 1;
-// 		const response = await putData(`/articulos/articulo/${row._id}`, {
-// 			status: newStatus,
-// 		});
-
-// 		if (response.articulo) {
-// 			row.status = newStatus;
-// 			console.log("Estado del artículo actualizado", response.articulo);
-// 			$q.notify({
-// 				type: "positive",
-// 				message: "Estado actualizado correctamente",
-// 			});
-// 		} else {
-// 			throw new Error(response.message || "No se pudo cambiar el estado");
-// 		}
-// 	} catch (error) {
-// 		console.log("Error al cambiar el estado", error.message);
-// 		$q.notify({
-// 			type: "negative",
-// 			message: `Error: ${error.message}`,
-// 		});
-// 	}
-// };
-
-// const editarArticulo = async (id) => {
-// 	try {
-// 		console.log("Artículo a editar", articulo.value);
-
-// 		const response = await putData(`/articulos/articulo/${id}`, {
-// 			nombre: articulo.value.nombre,
-// 			precio: articulo.value.precio,
-// 			stock: articulo.value.stock,
-// 			imagen: articulo.value.imagen,
-// 			categoria: articulo.value.categoria,
-// 			estado: articulo.value.estado,
-// 		});
-
-// 		if (response.articulo) {
-// 			console.log("Artículo editado", response.articulo);
-// 			$q.notify({
-// 				type: "positive",
-// 				message: "Artículo editado correctamente",
-// 			});
-// 		} else {
-// 			console.log("Error al editar el artículo", response.message);
-// 			$q.notify({
-// 				type: "negative",
-// 				message: `Error: ${response.message}`,
-// 			});
-// 		}
-// 	} catch (error) {
-// 		console.log("Error al editar el artículo", error.message);
-// 		$q.notify({
-// 			type: "negative",
-// 			message: `Error: ${error.message}`,
-// 		});
-// 	}
-// };
-
-// onMounted(() => {
-// 	dataArticulos();
-// });
 </script>
 
 <style scoped>

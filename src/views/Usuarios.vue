@@ -269,7 +269,6 @@ const postUsuario = async () => {
 		nuevoUsuario.value.nombre = nuevoUsuario.value.nombre.trim();
 		nuevoUsuario.value.email = nuevoUsuario.value.email.trim();
 		nuevoUsuario.value.contraseña = nuevoUsuario.value.contraseña.trim();
-		alert("hola");
 		const response = await postData("usuarios", nuevoUsuario.value);
 		console.log("Usuario creado con éxito", response);
 		modalAgregarUsuario.value = false;
@@ -360,17 +359,11 @@ const putUsuarios = async () => {
 	}
 };
 const confirmarCambioEstado = async (dato) => {
-// 	if (!usuarioSeleccionado.value) return;
-
-// 	const Usuario = usuarioSeleccionado.value;
-// /* 	Usuario.estado = Usuario.estado === 1 ? 0 : 1; */
-
 	try {
 		const response = await putData(`usuarios/${ dato.estado === 1 ? "inactivar" : "activar"}/${dato._id}`, {});
 		console.log("Estado actualizado con éxito:", response);
 
 		await getUsuarios();
-		// modalConfirmarEstado.value = false;
 	} catch (error) {
 		console.log(
 			"Error al actualizar el estado:",
@@ -378,10 +371,6 @@ const confirmarCambioEstado = async (dato) => {
 		);
 	}
 };
-
-// const cancelarCambioEstado = () => {
-// 	modalConfirmarEstado.value = false;
-// };
 </script>
 
 <style scoped>

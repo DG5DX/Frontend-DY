@@ -96,6 +96,9 @@
 <script setup>
 import { onMounted, ref, computed } from "vue";
 import { getData, postData, putData } from "../services/apiClient.js";
+import { useQuasar } from "quasar"; // Importar Quasar para las notificaciones
+
+const $q = useQuasar();
 
 const rows = ref([]);
 let columns = ref([
@@ -131,7 +134,7 @@ let columns = ref([
 const mostrarFormularioCategoria = ref(false);
 const accionFormulario = ref(true);
 
-// Variables que contienen la informacion del fomulario
+// Variables que contienen la informacion del formulario
 const nombreCategoria = ref("");
 const descripcionCategoria = ref("");
 
@@ -154,19 +157,39 @@ async function getCategoria() {
 	try {
 		const res = await getData("categorias");
 		rows.value = res.categorias;
+		$q.notify({
+			type: "positive",
+			message: "Categorías cargadas exitosamente.",
+			timeout: 3000,
+		});
 	} catch (error) {
 		console.log(error);
+		$q.notify({
+			type: "negative",
+			message: "Error al cargar categorías.",
+			timeout: 3000,
+		});
 	}
 }
 
 async function editarEstado(data) {
 	try {
-		const res = await putData(
+		await putData(
 			`categorias/${data.estado === 1 ? "inactivar" : "activar"}/${data._id}`
 		);
 		getCategoria();
+		$q.notify({
+			type: "positive",
+			message: `Categoría ${data.estado === 1 ? "inactivada" : "activada"} con éxito.`,
+			timeout: 3000,
+		});
 	} catch (error) {
 		console.log(error);
+		$q.notify({
+			type: "negative",
+			message: "Error al cambiar el estado de la categoría.",
+			timeout: 3000,
+		});
 	}
 }
 
@@ -176,12 +199,22 @@ async function agregar() {
 			nombre: nombreCategoria.value,
 			descripcion: descripcionCategoria.value,
 		};
-		const res = await postData("categorias", data);
+		await postData("categorias", data);
 		mostrarFormularioCategoria.value = false;
 		reset();
 		getCategoria();
+		$q.notify({
+			type: "positive",
+			message: "Categoría agregada exitosamente.",
+			timeout: 3000,
+		});
 	} catch (error) {
 		console.log(error);
+		$q.notify({
+			type: "negative",
+			message: "Error al agregar categoría.",
+			timeout: 3000,
+		});
 	}
 }
 
@@ -191,15 +224,22 @@ async function editar() {
 			nombre: nombreCategoria.value,
 			descripcion: descripcionCategoria.value,
 		};
-		const res = await putData(
-			`categorias/${categoriaSeleccionado.value}`,
-			data
-		);
+		await putData(`categorias/${categoriaSeleccionado.value}`, data);
 		mostrarFormularioCategoria.value = false;
 		reset();
 		getCategoria();
+		$q.notify({
+			type: "positive",
+			message: "Categoría editada exitosamente.",
+			timeout: 3000,
+		});
 	} catch (error) {
 		console.log(error);
+		$q.notify({
+			type: "negative",
+			message: "Error al editar categoría.",
+			timeout: 3000,
+		});
 	}
 }
 
@@ -210,20 +250,6 @@ function controlFormulario(accion, datos) {
 	accionFormulario.value = accion;
 	mostrarFormularioCategoria.value = true;
 }
-
-// const dataCategorias = async () => {
-// 	try {
-// 		const response = await getData("/categorias/categorias");
-// 		if (response.categorias) {
-// 			rows.value = response.categorias;
-// 			console.log("categorias recibidas" + response.categorias);
-// 		} else {
-// 			console.log("no llegaron las categorias" + response);
-// 		}
-// 	} catch (error) {
-// 		console.log("error al obtene articulo" + error.message);
-// 	}
-// };
 </script>
 
 <style scoped>

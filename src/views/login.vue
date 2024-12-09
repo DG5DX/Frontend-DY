@@ -51,6 +51,7 @@ import { ref, onMounted } from "vue";
 import { postData } from "../services/apiClient.js";
 import { useRouter } from "vue-router";
 import { useAuthStore } from "../store/useAuth.js";
+import { useQuasar } from "quasar"; // Importar Quasar para las notificaciones
 
 const email = ref("");
 const password = ref("");
@@ -60,6 +61,7 @@ const showPassword = ref(false); // Estado para mostrar/ocultar contraseña
 const router = useRouter();
 const showForm = ref(false);
 const authStore = useAuthStore();
+const $q = useQuasar(); // Instancia de Quasar para usar notificaciones
 
 // Mostrar/ocultar contraseña
 const togglePasswordVisibility = () => {
@@ -86,29 +88,59 @@ const login = async () => {
     const response = await postData("/usuarios/login", payload); // Misma ruta que en el registro
     const token = response.token;
 
-    console.log("Token recibido:", response);
-
     if (token) {
       authStore.token = token;
-      console.log("Token guardado:", authStore.token);
+
+      // Mostrar notificación de éxito
+      $q.notify({
+        type: "positive",
+        message: "Inicio de sesión exitoso",
+        position: "top",
+        timeout: 3000,
+      });
 
       // Redirige a la página principal después del inicio de sesión
       router.push("/home");
     } else {
       console.log("Respuesta sin token:", response);
+
+      // Mostrar notificación de error si no hay token
+      $q.notify({
+        type: "negative",
+        message: "Inicio de sesión fallido: Token no recibido",
+        position: "top",
+        timeout: 3000,
+      });
     }
   } catch (error) {
     if (error.response && error.response.data.error === "Contraseña incorrecta") {
       passwordError.value = "La contraseña es incorrecta";
+
+      // Mostrar notificación de error por contraseña incorrecta
+      $q.notify({
+        type: "negative",
+        message: "Contraseña incorrecta",
+        position: "top",
+        timeout: 3000,
+      });
     } else {
       console.log("Error al iniciar sesión:", error.response?.data?.error || error.message);
       passwordError.value = "";
+
+      // Mostrar notificación de error genérico
+      $q.notify({
+        type: "negative",
+        message: "Error al iniciar sesión. Intente nuevamente.",
+        position: "top",
+        timeout: 3000,
+      });
     }
   } finally {
     loading.value = false; // Desactivar estado de carga
   }
 };
 </script>
+
 
 <style scoped>
 * {
